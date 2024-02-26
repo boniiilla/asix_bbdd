@@ -1,3 +1,5 @@
+Exportació de dades:
 mysqldump -u root -p --no-create-info --no-create-db movies > /home/usuari/compartida/M02UF3/movies-dades-dump.sql
 
+Exportació de taules:
 mysqldump -u root -p --no-data --skip-triggers --no-create-db --skip-opt movies > /home/usuari/compartida/M02UF3/movies-taules-dump.sql
