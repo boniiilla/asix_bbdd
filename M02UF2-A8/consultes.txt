@@ -1,0 +1,156 @@
+CONSULTES
+
+1. Obtenir els colors que hi han disponibles:
+
+SELECT * FROM colors 
+ORDER BY 1;
++-------+---------+
+| idcol | nomcol  |
++-------+---------+
+|     1 | vermell |
+|     2 | blau    |
+|     3 | verd    |
+|     4 | groc    |
+|     5 | taronja |
+|     6 | fucsia  |
+|     7 | rosa    |
+|     8 | blanc   |
+|     9 | negre   |
+|    10 | gris    |
++-------+---------+
+
+2. Obtenir el nom i la descripció de les classes de categoria 3:
+
+SELECT nomclas, descripcio FROM classe 
+WHERE idcat = 3;
++-----------+------------+
+| nomclas   | descripcio |
++-----------+------------+
+| Pantalons | Pantalons  |
+| Camiseta  | Camiseta   |
+| Falda     | Falda      |
+| Abrigo    | Abrigo     |
++-----------+------------+
+
+3. Mostra el id dels articles i el preuvenda amb preu de venda superior als 10€.
+
+SELECT idart, preuvenda FROM article 
+WHERE preuvenda > 10;
++-------+-----------+
+| idart | preuvenda |
++-------+-----------+
+|     3 |     10.99 |
+|     5 |     24.00 |
+|     6 |     19.99 |
+|     9 |     24.00 |
+|    10 |     70.00 |
++-------+-----------+
+
+4. Mostra els articles i les seves unitats de la part superior dels adults amb talla M i masculins.
+
+SELECT idart, uds FROM midadultsup mas 
+WHERE mas.genere = 'M' and mas.talla = 'M';
++-------+------+
+| idart | uds  |
++-------+------+
+|    10 |  150 |
+|     7 |   35 |
++-------+------+
+
+5. Mostra el id dels articles, la classe, el color i les talles que hi han disponibles en talla inferior.
+
+SELECT mi.idart, cl.nomclas, col.nomcol, mi.talla FROM midadultinf mi 
+JOIN article a USING(idart) 
+JOIN classe cl USING(idclas) 
+JOIN colors col USING(idcol);
++-------+-----------+--------+-------+
+| idart | nomclas   | nomcol | talla |
++-------+-----------+--------+-------+
+|     6 | Pantalons | blau   | 38    |
+|     6 | Pantalons | blau   | 40    |
+|     6 | Pantalons | blau   | 42    |
+|     6 | Pantalons | blau   | 42    |
+|     6 | Pantalons | blau   | 38    |
+|     9 | Pantalons | blau   | 60    |
+|     9 | Pantalons | blau   | 52    |
+|     9 | Pantalons | blau   | 56    |
+|     9 | Pantalons | blau   | 56    |
+|     5 | Pantalons | gris   | 44    |
++-------+-----------+--------+-------+
+
+6. Mostra els articles, el nom de la categoria, el nom de la clase, el tipus, el material i el color dels articles que te un preu de cost superior als 3.00€ i un preu de venda inferior als 50.00€.
+
+SELECT a.idart, cat.nomcat, cl.nomclas, ti.nomtip, ma.nommat, col.nomcol FROM article a 
+JOIN categoria cat USING(idcat) 
+JOIN classe cl USING(idclas) 
+JOIN tipus ti USING(idtip) 
+JOIN material ma USING(idmat) 
+JOIN colors col USING(idcol) 
+WHERE preuvenda < 50 and preucost > 3;
++-------+----------------+-----------+--------+--------+--------+
+| idart | nomcat         | nomclas   | nomtip | nommat | nomcol |
++-------+----------------+-----------+--------+--------+--------+
+|     5 | Roba de vestir | Pantalons | Cargo  | denim  | gris   |
+|     6 | Roba de vestir | Pantalons | Jeans  | cuir   | blau   |
+|     9 | Roba de vestir | Pantalons | Cargo  | denim  | blau   |
++-------+----------------+-----------+--------+--------+--------+
+
+7. Mostra la classe i el tipus dels articles que son negres i tenen talla de nena.
+
+SELECT cl.nomclas, ti.nomtip FROM midanen mn 
+JOIN article a ON mn.idart=a.idart 
+JOIN classe cl USING(idclas) 
+JOIN tipus ti USING(idtip) 
+JOIN colors co USING(idcol) 
+WHERE co.nomcol="gris";
++-----------+--------+
+| nomclas   | nomtip |
++-----------+--------+
+| Pantalons | Cargo  |
+| Pantalons | Cargo  |
+| Pantalons | Cargo  |
+| Pantalons | Cargo  |
++-----------+--------+
+
+8. Mostra el nombre i el preu de venda dels productes de roba de vestir que utilitzen material de denim:
+
+SELECT a.idart, a.preuvenda FROM article a
+WHERE a.idmat IN (SELECT idmat FROM material WHERE nommat = 'denim')
+	AND a.idcat = (SELECT idcat FROM categoria 
+	WHERE nomcat = 'Roba de vestir');
++-------+-----------+
+| idart | preuvenda |
++-------+-----------+
+|     5 |     24.00 |
+|     9 |     24.00 |
++-------+-----------+
+
+9. Mostra l'identificador de l'article, la classe, el tipus i les unitats que tinguin talla en midanedo i en midanen.
+
+SELECT idart, 
+	(SELECT nomclas FROM classe WHERE idclas = a.idclas) AS nomclas,
+	(SELECT nomtip FROM tipus WHERE idtip = a.idtip) AS nomtip,
+	uds
+FROM article a
+WHERE idart IN (SELECT idart FROM midanedo)
+	AND idart IN (SELECT idart FROM midanen);
++-------+----------+--------------+------+
+| idart | nomclas  | nomtip       | uds  |
++-------+----------+--------------+------+
+|     7 | Camiseta | Maniga Corta |  320 |
+|     8 | Camiseta | Maniga Corta |  790 |
++-------+----------+--------------+------+
+
+10. Selecciona la identificació de l'article, el preu de venda, el nom de la classe i el nom del tipus de tots els productes de roba de vestir amb un preu de venda superior a la mitjana de tots els productes de roba de vestir.
+
+SELECT a.idart, a.preuvenda, 
+	(SELECT c.nomclas FROM classe c WHERE c.idclas = a.idclas) AS nomclas,
+	(SELECT t.nomtip FROM tipus t WHERE t.idtip = a.idtip) AS nomtip
+FROM article a
+WHERE a.idcat = (SELECT idcat FROM categoria WHERE nomcat = 'Roba de vestir') AND a.preuvenda > (SELECT 	AVG(preuvenda) FROM article WHERE idcat = (SELECT idcat FROM categoria 
+	WHERE nomcat = 'Roba de vestir'));
++-------+-----------+---------+--------+
+| idart | preuvenda | nomclas | nomtip |
++-------+-----------+---------+--------+
+|    10 |     70.00 | Abrigo  | Parca  |
++-------+-----------+---------+--------+  
