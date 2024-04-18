@@ -1,0 +1,141 @@
+TAULES:
++---------------------------+
+| Tables_in_habitatge       |
++---------------------------+
+| caracteristiques          |
+| caracteristiques_vivendes |
+| casa                      |
+| comarca                   |
+| consum_energetic          |
+| municipi                  |
+| municipi_vivenda          |
+| pis                       |
+| provincia                 |
+| vivenda                   |
++---------------------------+
+
+caracteristiques:
+otes les caracteristiques de les vivendes en una taula externa amb la seva id.
++-------------------+------------------+----------+-----------------+---------------------------------------+-------+------------+---------+---------+----------+----------+-------+
+| id_caracteristica | aire_condicionat | ascensor | armari_empotrat | garatge                               | jardi | calefaccio | piscina | traster | xemeneia | terrassa | balco |
++-------------------+------------------+----------+-----------------+---------------------------------------+-------+------------+---------+---------+----------+----------+-------+
+|                 1 |                0 |        0 |               0 |                                       |     0 |            |       0 |       1 |        0 |        1 |     0 |
+|                 2 |                0 |        0 |               0 | plaza de garaje incluida en el precio |     0 |            |       0 |       1 |        0 |        1 |     0 |
+|                 3 |                0 |        0 |               0 |                                       |     0 |            |       0 |       0 |        0 |        0 |     0 |
+|                 4 |                1 |        0 |               1 |                                       |     0 |            |       0 |       0 |        0 |        1 |     0 |
+|                 5 |                1 |        1 |               1 | plaza de garaje incluida en el precio |     1 |            |       1 |       0 |        0 |        1 |     0 |
++-------------------+------------------+----------+-----------------+---------------------------------------+-------+------------+---------+---------+----------+----------+-------+
+
+caracteristiques_vivendes:
+Relacio del identificador de la vivenda amb l'identificador de la caracteristica:
++------------+-------------------+
+| id_vivenda | id_caracteristica |
++------------+-------------------+
+|     310988 |                 1 |
+|     321374 |                 2 |
+|     334861 |                 3 |
+|     338235 |                 4 |
+|     338583 |                 5 |
++------------+-------------------+
+
+vivenda:
+Taula amb tota la informació principal de la vivenda:
++------------+-------+------------+-------+--------------------+---------------------+-----------------+-------------------+------------+--------------------+-------------------------------------------------------------------------------------------------------------------------------------------------+------------+
+| id_vivenda | tipus | dormitoris | banys | superficie_vivenda | superficie_terrassa | any_construccio | estat_conservacio | preu_venda | disponible_lloguer | descripcio                                                                                                                                      | data       |
++------------+-------+------------+-------+--------------------+---------------------+-----------------+-------------------+------------+--------------------+-------------------------------------------------------------------------------------------------------------------------------------------------+------------+
+|     310988 | Pis   | 2          |     1 |             118.00 |               13.29 |               0 | Reformada         |  170000.00 |               NULL | vistas a la montaña y situado a 5 minutos de las pistas de esquí. precio negociable, distribución:, terraza descubierta de 18 m2, la casa di    | 2019-04-15 |
+|     321374 | Casa  | 4          |     3 |             660.00 |               81.88 |               0 | Reformada         |  300000.00 |               NULL | casa de 600 metros planta baja local comercial, 2º planta almacén, 3º planta vivienda de unos 130 metros, garaje en sótano.                     | 2019-04-15 |
+|     334861 | Casa  | 4          |     2 |             480.00 |                NULL |               0 | Reformada         |  475000.00 |               NULL |                                                                                                                                                 | 2019-04-12 |
+|     338235 | Pis   | 3          |     1 |              80.00 |                8.99 |               0 | Reformada         |  190000.00 |               NULL | se vende o alquila 550? todo el piso esta recién reformado las paredes del baño es de porcelanico el espejo incrustado a la pared plato de d    | 2019-04-15 |
+|     338583 | Pis   | 2          |     2 |              71.00 |                8.50 |               0 | Reformada         |  152000.00 |               NULL | De particular a particular (abstenerse agencias), magnífico apartamento de 71 m2 completamente amueblado, con bomba de calor y con electrodo    | 2019-04-15 |
++------------+-------+------------+-------+--------------------+---------------------+-----------------+-------------------+------------+--------------------+-------------------------------------------------------------------------------------------------------------------------------------------------+------------+
+
+
+casa:
+Taula en referencia a les vivendes que son cases.
++------------+-------------------------+-------------+--------------------+------------------+
+| id_vivenda | tipus                   | num_plantes | superficie_garatge | superficie_jardi |
++------------+-------------------------+-------------+--------------------+------------------+
+|     321374 | Casa o chalet independi | 3 plantas   |              87.21 |             NULL |
+|     334861 | Casa o chalet independi |             |               NULL |             NULL |
+|     418376 | Casa o chalet independi | 4 plantas   |              26.36 |            30.87 |
+|     419312 | Casa o chalet independi | 2 plantas   |             179.35 |             NULL |
+|     440849 | Chalet adosado          |             |              15.74 |             NULL |
++------------+-------------------------+-------------+--------------------+------------------+
+
+
+pis:
+Taula en referencia a les vivendes que son pisos:
++------------+---------+---------------------+
+| id_vivenda | tipus   | num_planta          |
++------------+---------+---------------------+
+|     310988 | Piso    | bajo exterior       |
+|     338235 | Piso    | planta 1ª exterior  |
+|     338583 | Piso    | planta 3ª exterior  |
+|     361079 | Dúplex  | planta 3ª exterior  |
+|     363258 | Estudio | planta 3ª exterior  |
++------------+---------+---------------------+
+
+
+consum_energetic:
+Taula descriptiva del consum o les emissions de cada vivenda.
++------------+--------+----------+
+| id_vivenda | consum | emisions |
++------------+--------+----------+
+|     310988 | F      | C        |
+|    1589965 | C      | E        |
+|    1759720 | E      | G        |
+|    1923626 | D      | A        |
+|    1976103 | D      | B        |
++------------+--------+----------+
+
+
+provincia:
+Taula de provincies:
++--------------+------------------+------------+
+| id_provincia | nom_oficial      | nom_catala |
++--------------+------------------+------------+
+|            1 | Araba/Álava      | Àlaba      |
+|            2 | Albacete         | Albacete   |
+|            3 | Alacant/Alicante | Alacant    |
+|            4 | Almería          | Almeria    |
+|            5 | Ávila            | Àvila      |
++--------------+------------------+------------+
+
+comarca:
+Taula de les comarques:
++------------+--------------+
+| id_comarca | nom_comarca  |
++------------+--------------+
+|          1 | Alt Camp     |
+|          2 | Alt Empordà  |
+|          3 | Alt Penedès  |
+|          4 | Alt Urgell   |
+|          6 | Anoia        |
++------------+--------------+
+
+
+municipi:
+Taula amb els municipis, comarques i provincies relacionades, tambe descriu la posició del territori.
++-------------+--------------+-------------------+------------+----------+------+------+---------+----------+--------------------------------+
+| id_municipi | id_provincia | nom_municipi      | id_comarca | codi_INE | utmX | utmY | latitud | longitud | geo_referencia                 |
++-------------+--------------+-------------------+------------+----------+------+------+---------+----------+--------------------------------+
+|          10 |            4 | Abla              |       NULL | 104      | NULL | NULL |    NULL |     NULL | NULL                           |
+|          11 |            9 | Abajas            |       NULL | 119      | NULL | NULL |    NULL |     NULL | NULL                           |
+|          12 |            7 | Alaró             |       NULL | 127      | NULL | NULL |    NULL |     NULL | NULL                           |
+|          13 |            5 | Adanero           |       NULL | 135      | NULL | NULL |    NULL |     NULL | NULL                           |
+|          14 |            1 | Alegría-Dulantzi  |       NULL | 141      | NULL | NULL |    NULL |     NULL | NULL                           |
++-------------+--------------+-------------------+------------+----------+------+------+---------+----------+--------------------------------+
+
+
+municipi_vivenda:
+Taula de relacio per veure on es situa cada vienda en cada municipi.
++------------+-------------+--------------+
+| id_vivenda | id_municipi | id_provincia |
++------------+-------------+--------------+
+|     310988 |        2240 |           17 |
+|     334861 |        1228 |            8 |
+|     338235 |        1523 |           17 |
+|     338583 |        1523 |           17 |
+|     361079 |         391 |           17 |
++------------+-------------+--------------+

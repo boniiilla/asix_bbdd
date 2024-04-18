@@ -4,13 +4,13 @@ USE habitatge;
 
 CREATE TABLE `vivenda` (
     id_vivenda INT AUTO_INCREMENT PRIMARY KEY,
-    tipus VARCHAR(24),
+    tipus ENUM('Pis', 'Casa'),
     dormitoris VARCHAR(24),
     banys INT,
     superficie_vivenda DECIMAL(8, 2),
     superficie_terrassa DECIMAL(8, 2),
     any_construccio INT,
-    estat_conservacio ENUM('segunda mano/buen estado', 'segunda mano/para reformar', 'promoción de obra nueva', ''),
+    estat_conservacio ENUM('Nova', 'Reformada', 'Cal Reformar'),
     preu_venda DECIMAL(10, 2),
     disponible_lloguer BOOLEAN,
     descripcio VARCHAR(140),
@@ -19,7 +19,21 @@ CREATE TABLE `vivenda` (
 
 CREATE TABLE `casa` (
     id_vivenda INT AUTO_INCREMENT PRIMARY KEY,
-    tipus VARCHAR(24),
+    tipus ENUM(
+        'Casa o chalet independi',
+        'Chalet adosado',
+        'Chalet pareado',
+        'Finca rústica',
+        'Casa o chalet',
+        'Casa terrera',
+        'Casa rural',
+        'Masía',
+        'Torre',
+        'Casa de pueblo',
+        'Palacio',
+        'Caserón',
+        'Castillo'
+        ),
     num_plantes VARCHAR(48),
     superficie_garatge DECIMAL(8, 2),
     superficie_jardi DECIMAL(8, 2),
@@ -28,7 +42,12 @@ CREATE TABLE `casa` (
 
 CREATE TABLE `pis` (
     id_vivenda INT AUTO_INCREMENT PRIMARY KEY,
-    tipus VARCHAR(24),
+    tipus ENUM(
+        'Piso',
+        'Dúplex',
+        'Estudio',
+        'Ático'
+    ),
     num_planta VARCHAR(48),
     FOREIGN KEY (id_vivenda) REFERENCES vivenda(id_vivenda)
 ) ENGINE=InnoDB;
@@ -38,13 +57,13 @@ CREATE TABLE `caracteristiques` (
     aire_condicionat BOOLEAN,
     ascensor BOOLEAN,
     armari_empotrat BOOLEAN,
-    garatge VARCHAR(48),
+    garatge BOOLEAN,
     jardi BOOLEAN,
-    calefaccio VARCHAR(48),
+    calefaccio BOOLEAN,
     piscina BOOLEAN,
     traster BOOLEAN,
     xemeneia BOOLEAN,
-    terassa BOOLEAN,
+    terrassa BOOLEAN,
     balco BOOLEAN
 ) ENGINE=InnoDB;
 
@@ -77,7 +96,7 @@ CREATE TABLE `municipi` (
     utmY VARCHAR(100),
     latitud DECIMAL(9,6),
     longitud DECIMAL(9,6),
-    geo_referencia VARCHAR(100),
+    geo_referencia POINT,
     PRIMARY KEY(id_municipi, id_provincia),
     FOREIGN KEY (id_provincia) REFERENCES provincia(id_provincia),
     FOREIGN KEY (id_comarca) REFERENCES comarca(id_comarca)

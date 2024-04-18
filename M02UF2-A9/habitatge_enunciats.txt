@@ -1,0 +1,44 @@
+1. Troba totes les cases que tenen més de dues plantes:
+SELECT * FROM casa WHERE num_plantes > 2;
+
+2. Llista tots els pisos que estan a la planta baixa:
+SELECT * FROM pis WHERE num_planta = 'Planta baixa';
+
+3. Mostra totes les característiques que tenen piscina:
+SELECT * FROM caracteristiques WHERE piscina = 1;
+
+4. Mostra totes les vivendes amb una superfície superior a 100 metres quadrats i que estiguin en bon estat de conservació:
+SELECT * FROM vivenda WHERE superficie_vivenda > 100 AND estat_conservacio = 'Reformada';
+
+5. Mostra les vivendes, incloent el municipi on estan ubicades:
+SELECT v.id_vivenda, m.nom_municipi
+FROM vivenda v
+JOIN municipi_vivenda USING(id_vivenda)
+JOIN municipi m USING(id_municipi);
+
+6. Mostra els noms dels municipis i les comarques on es troben ubicades les vivendes:
+SELECT m.nom_municipi, c.nom_comarca
+FROM municipi m
+JOIN comarca c ON m.id_comarca = c.id_comarca;
+
+7. Mostra la vivenda i les seves característiques en les vivendes que tinguin aire condicionat:
+SELECT v.tipus, c.*
+FROM vivenda v
+JOIN caracteristiques_vivendes cv ON v.id_vivenda = cv.id_vivenda
+JOIN caracteristiques c ON cv.id_caracteristica = c.id_caracteristica
+WHERE c.aire_condicionat = 1;
+
+8. Mostra totes les vivendes i el seu preu que es troben en municipis de la comarca "Barcelonès"
+SELECT id_vivenda, preu_venda
+FROM vivenda
+WHERE id_municipi IN (SELECT id_municipi FROM municipi 
+WHERE id_comarca IN (
+SELECT id_comarca FROM comarca WHERE nom_comarca = 'Barcelonès'));
+
+9. Mostra totes les característiques de les vivendes que tenen un preu de venda superior a la mitjana:
+SELECT *
+FROM caracteristiques
+WHERE id_caracteristica IN (
+SELECT id_caracteristica FROM caracteristiques_vivendes 
+WHERE id_vivenda IN (
+SELECT id_vivenda FROM vivenda WHERE preu_venda > (SELECT AVG(preu_venda) FROM vivenda)));

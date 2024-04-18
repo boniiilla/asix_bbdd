@@ -1,6 +1,5 @@
 USE habitatge;
 
--- TABLAS COMPLETAS CSV --
 DROP TEMPORARY TABLE IF EXISTS municipi_com_prov;
 CREATE TEMPORARY TABLE IF NOT EXISTS municipi_com_prov (
     cod_mun INT PRIMARY KEY,
@@ -31,8 +30,8 @@ SELECT DISTINCT cod_com, nom_com
 FROM municipi_com_prov
 WHERE cod_com IS NOT NULL;
 
-INSERT INTO municipi(id_municipi, id_provincia, nom_municipi, id_comarca, utmX, utmY, longitud, latitud, geo_referencia)
-SELECT DISTINCT cod_mun, cod_prov, nom_mun, cod_com, UTMX, UTMY, longi, lati, georef 
+INSERT INTO municipi(id_municipi, id_provincia, nom_municipi, id_comarca, utmX, utmY, longitud, latitud)
+SELECT DISTINCT cod_mun, cod_prov, nom_mun, cod_com, UTMX, UTMY, longi, lati 
 FROM municipi_com_prov;
 
 DROP TEMPORARY TABLE IF EXISTS houses;
@@ -78,10 +77,16 @@ IGNORE 1 LINES
 construct_date, floor, garage_desc, garden, heating, house_id, house_type, lift, loc_city, loc_zone, 
 m2_real, m2_useful, obtention_date, price, room_num, storage_room, swimming_pool, terrace);
 
-INSERT INTO vivenda(id_vivenda, tipus, dormitoris, banys, superficie_vivenda, any_construccio, 
+INSERT INTO vivenda(id_vivenda, dormitoris, banys, superficie_vivenda, any_construccio, 
 estat_conservacio, preu_venda, descripcio, data)
-SELECT house_id, LTRIM(house_type), room_num, bath_num, m2_real, construct_date, condicion, price,
-descript, obtention_date
+SELECT house_id, room_num, bath_num, m2_real, construct_date,
+CASE condicion
+    WHEN 'segunda mano/buen estado' THEN 'Reformada'
+    WHEN 'segunda mano/para reformar' THEN 'Cal Reformar'
+    WHEN 'promoción de obra nueva' THEN 'Nova'
+    WHEN '' THEN NULL
+END, 
+price, descript, obtention_date
 FROM houses;
 
 INSERT INTO municipi_vivenda(id_vivenda, id_municipi, id_provincia)
@@ -125,6 +130,28 @@ UPDATE municipi
 SET codi_INE = CONCAT(LEFT(id_municipi, 3), id_provincia)
 WHERE codi_INE IS NULL;
 
+UPDATE vivenda
+SET tipus = 'Pis'
+WHERE id_vivenda IN (
+SELECT house_id
+FROM houses
+WHERE house_type = "Dúplex" or 
+house_type = "Piso" or 
+house_type = "Ático" or 
+house_type = "Estudio"
+);
+
+UPDATE vivenda
+SET tipus = 'Casa'
+WHERE id_vivenda IN (
+SELECT house_id
+FROM houses
+WHERE house_type != "Dúplex" and
+house_type != "Piso" and 
+house_type != "Ático" and 
+house_type != "Estudio"
+);
+
 INSERT INTO pis(id_vivenda, tipus, num_planta)
 SELECT house_id, LTRIM(house_type), floor 
 FROM houses 
@@ -141,11 +168,53 @@ house_type != "Piso" and
 house_type != "Ático" and 
 house_type != "Estudio";
 
-INSERT INTO caracteristiques(aire_condicionat, ascensor, armari_empotrat, garatge, jardi, calefaccio, piscina, traster, xemeneia, terassa, balco)
-SELECT air_conditioner, lift, built_in_wardrobe, garage_desc, garden, heating, swimming_pool, storage_room, chimeney, terrace, balcony
+INSERT INTO caracteristiques(aire_condicionat, ascensor, armari_empotrat, garatge, jardi, calefaccio, piscina, traster, xemeneia, terrassa, balco)
+SELECT air_conditioner, lift, built_in_wardrobe,
+CASE garage_desc
+    WHEN '' THEN 0
+    ELSE 1
+END,
+garden, 
+CASE heating
+    WHEN '' THEN 0
+    ELSE 1
+END, 
+swimming_pool, storage_room, chimeney, terrace, balcony
 FROM houses ORDER BY house_id;
 
 INSERT INTO caracteristiques_vivendes(id_vivenda)
 SELECT house_id
 FROM houses 
 ORDER BY house_id; 
+
+UPDATE vivenda
+SET superficie_terrassa = ROUND((RAND()*10 + 7)*(superficie_vivenda/100),2)
+WHERE id_vivenda IN (
+    SELECT id_vivenda 
+    FROM caracteristiques_vivendes 
+    JOIN caracteristiques USING (id_caracteristica)
+    WHERE terrassa = 1);
+
+UPDATE casa c
+SET superficie_garatge = 
+    (SELECT ROUND((RAND()*10 + 7)*(superficie_vivenda/100),2) 
+    FROM vivenda v WHERE v.id_vivenda = c.id_vivenda)
+WHERE id_vivenda IN (
+    SELECT id_vivenda 
+    FROM caracteristiques_vivendes 
+    JOIN caracteristiques USING (id_caracteristica)
+WHERE garatge = 1);
+
+UPDATE casa c
+SET superficie_jardi = 
+    (SELECT ROUND((RAND()*10 + 7)*(superficie_vivenda/100),2) 
+    FROM vivenda v WHERE v.id_vivenda = c.id_vivenda)
+WHERE id_vivenda IN (
+    SELECT id_vivenda 
+    FROM caracteristiques_vivendes 
+    JOIN caracteristiques USING (id_caracteristica)
+WHERE jardi = 1);
+
+UPDATE municipi
+SET geo_referencia = IF(latitud and longitud IS NOT NULL, POINT(longitud, latitud), NULL)
+WHERE latitud and longitud IS NOT NULL;
